@@ -2,17 +2,12 @@ const express = require('express');
 const http = require('http');
 const socketIO = require('socket.io');
 
-const { Client } = require('pg');
-
-const client = new Client({
-  connectionString: process.env.DATABASE_URL,
-  ssl: true,
-});
-
 const PORT = process.env.PORT || 3000;
 const app = express();
 const server = http.createServer(app);
 const io = socketIO(server);
+
+const URL = 'https://clicker-uproar.firebaseio.com/clicks.json';
 
 // This is what the socket.io syntax is like, we will work this later
 io.on('connection', socket => {
@@ -25,7 +20,11 @@ io.on('connection', socket => {
         socket.broadcast.emit('clicked', data);
         let win = countClicks(data);
         if (win !== null) {
-            socket.emit('win', 'You win ' + countClicks(data) + '!');
+            sendWinToDatabase(socket, data)
+                .then(res => {
+                    socket.emit('win', res);
+                });
+            // socket.emit('win', 'You win ' + countClicks(data) + '!');
         }
     });
 
@@ -50,16 +49,12 @@ function sendClicksToDatabase(data) {
     console.log('Sending clicks: ' + data.clicks);
 }
 
-function sendWinToDatabase(socket, data) {
+async function sendWinToDatabase(socket, data) {
     console.log(socket.id);
     console.log(data.user)
     console.log(data.clicks);
-
-    client.connect();
-
-    let test = "terve"
-
-    return test;
+    const response = await fetch(URL);
+    return response;
 }
 
 
