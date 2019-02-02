@@ -7,8 +7,6 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIO(server);
 
-const axios = require('axios');
-
 const URL = 'https://clicker-uproar.firebaseio.com/clicks.json';
 
 // This is what the socket.io syntax is like, we will work this later
@@ -22,16 +20,14 @@ io.on('connection', socket => {
         socket.broadcast.emit('clicked', data);
         let win = countClicks(data);
         if (win !== null) {
-            sendWinToDatabase(socket, data)
-                .then(res => {
-                    socket.emit('win', res);
-                });
-            // socket.emit('win', 'You win ' + countClicks(data) + '!');
+            sendWinToDatabase(socket, data);
+            socket.emit('win', 'You win ' + countClicks(data) + '!');
         }
     });
 
     socket.on('unload', (data) => {
-        sendClicksToDatabase(data);
+        sendClicksToDatabase(data)
+            .then(response => console.log(response));
     })
 });
 
@@ -48,19 +44,13 @@ function countClicks(data) {
 }
 
 function sendClicksToDatabase(data) {
-    console.log('Sending clicks: ' + data.clicks);
+    console.log('Sending clicks: '+data.clicks);
 }
 
-async function sendWinToDatabase(socket, data) {
+function sendWinToDatabase(socket, data) {
     console.log(socket.id);
     console.log(data.user)
     console.log(data.clicks);
-    try {
-        const response = await axios.get(URL);
-        return response;
-    } catch (error) {
-        return error;
-    }
 }
 
 
