@@ -24,9 +24,8 @@ io.on('connection', socket => {
         socket.broadcast.emit('clicked', data);
         let win = countClicks(data);
         if (win !== null) {
-            const dbData = sendWinToDatabase(socket, data);
+            sendWinToDatabase(socket, data);
             socket.emit('win', 'You won ' + win + '!');
-            socket.emit('db', dbData);
         }
     });
 
@@ -55,11 +54,6 @@ function sendWinToDatabase(socket, data) {
     console.log(socket.id);
     console.log(data.user)
     console.log(data.clicks);
-    await pool.connect()
-
-    const res = await pool.query('SELECT $1::text as message', ['Hello world!'])
-    await client.end()
-    return res;
 }
 
 
