@@ -2,15 +2,15 @@ const express = require('express');
 const http = require('http');
 const socketIO = require('socket.io');
 
-// our localhost port
+const { Pool } = require('pg');
+const pool = new Pool({
+    connectionString: process.env.DATABASE_URL,
+    ssl: true
+  });
+
 const PORT = process.env.PORT || 3000;
-
 const app = express();
-
-// our server instance
 const server = http.createServer(app);
-
-// This creates our socket using the instance of the server
 const io = socketIO(server);
 
 // This is what the socket.io syntax is like, we will work this later
@@ -24,8 +24,9 @@ io.on('connection', socket => {
         socket.broadcast.emit('clicked', data);
         let win = countClicks(data);
         if (win !== null) {
+            const dbData = sendWinToDatabase(socket, data);
             socket.emit('win', 'You won ' + win + '!');
-            sendWinToDatabase(socket, data);
+            socket.emit('db', dbData);
         }
     });
 
@@ -54,6 +55,11 @@ function sendWinToDatabase(socket, data) {
     console.log(socket.id);
     console.log(data.user)
     console.log(data.clicks);
+    await pool.connect()
+
+    const res = await pool.query('SELECT $1::text as message', ['Hello world!'])
+    await client.end()
+    return res;
 }
 
 
