@@ -3,7 +3,7 @@ const http = require('http');
 const socketIO = require('socket.io');
 
 // our localhost port
-const port = 4001;
+const PORT = process.env.PORT || 3000;
 
 const app = express();
 
@@ -57,4 +57,4 @@ function sendWinToDatabase(socket, data) {
 }
 
 
-server.listen(port, () => console.log(`Listening on port ${port}`));
+server.listen(PORT, () => console.log(`Listening on port ${PORT}`));
