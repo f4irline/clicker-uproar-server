@@ -58,15 +58,7 @@ function sendWinToDatabase(socket, data) {
 
     client.connect();
 
-    let test = client.query('SELECT table_schema,table_name FROM information_schema.tables;', (err, res) => {
-        let testString = "";
-        if (err) throw err;
-        for (let row of res.rows) {
-          testString = JSON.stringify(row);
-        }
-        client.end();
-        return testString;
-    });
+    let test = "terve"
 
     return test;
 }
