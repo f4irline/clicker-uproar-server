@@ -7,6 +7,8 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIO(server);
 
+const axios = require('axios');
+
 const URL = 'https://clicker-uproar.firebaseio.com/clicks.json';
 
 // This is what the socket.io syntax is like, we will work this later
@@ -53,9 +55,8 @@ async function sendWinToDatabase(socket, data) {
     console.log(socket.id);
     console.log(data.user)
     console.log(data.clicks);
-    const response = await fetch(URL, {});
-    const json = await response.json();
-    return json;
+    const response = await axios.get(URL);
+    return response;
 }
 
 
