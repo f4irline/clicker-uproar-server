@@ -25,8 +25,7 @@ io.on('connection', socket => {
         socket.broadcast.emit('clicked', data);
         let win = countClicks(data);
         if (win !== null) {
-            let test = sendWinToDatabase(socket, data);
-            socket.emit('win', test);
+            socket.emit('win', 'You win ' + countClicks(data) + '!');
         }
     });
 
