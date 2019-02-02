@@ -2,11 +2,12 @@ const express = require('express');
 const http = require('http');
 const socketIO = require('socket.io');
 
-const { Pool } = require('pg');
-const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
-    ssl: true
-  });
+const { Client } = require('pg');
+
+const client = new Client({
+  connectionString: process.env.DATABASE_URL,
+  ssl: true,
+});
 
 const PORT = process.env.PORT || 3000;
 const app = express();
@@ -24,8 +25,8 @@ io.on('connection', socket => {
         socket.broadcast.emit('clicked', data);
         let win = countClicks(data);
         if (win !== null) {
-            sendWinToDatabase(socket, data);
-            socket.emit('win', 'You won ' + win + '!');
+            let test = sendWinToDatabase(socket, data);
+            socket.emit('win', test);
         }
     });
 
@@ -54,6 +55,20 @@ function sendWinToDatabase(socket, data) {
     console.log(socket.id);
     console.log(data.user)
     console.log(data.clicks);
+
+    client.connect();
+
+    let test = client.query('SELECT table_schema,table_name FROM information_schema.tables;', (err, res) => {
+        let testString = "";
+        if (err) throw err;
+        for (let row of res.rows) {
+          testString = JSON.stringify(row);
+        }
+        client.end();
+        return testString;
+    });
+
+    return test;
 }
 
 
