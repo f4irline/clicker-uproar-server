@@ -55,8 +55,12 @@ async function sendWinToDatabase(socket, data) {
     console.log(socket.id);
     console.log(data.user)
     console.log(data.clicks);
-    const response = await axios.get(URL);
-    return response;
+    try {
+        const response = await axios.get(URL);
+        return response;
+    } catch (error) {
+        return error;
+    }
 }
 
 
