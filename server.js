@@ -76,7 +76,7 @@ io.on('connection', socket => {
         let win = countClicks(); // Check if the client has won something after the click event
         if (win !== null) {
             sendWinToDatabase(win, data); // Send the win to the Postgres database
-            socket.emit('win', 'You win ' + win + '!'); // Let the client know that he/she has won something
+            socket.emit('win', win); // Let the client know that he/she has won something
         }
     });
 });
