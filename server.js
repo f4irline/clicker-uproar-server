@@ -2,7 +2,7 @@ const express = require('express');
 const http = require('http');
 const socketIO = require('socket.io');
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 5000;
 const app = express();
 const server = http.createServer(app);
 const io = socketIO(server);
@@ -85,11 +85,11 @@ io.on('connection', socket => {
  * @param {Object} data 
  */
 function countClicks(data) {
-    if (data.clicks % 50 === 0) {
+    if (data.clicks % 500 === 0) {
         return 'big';
-    } else if (data.clicks % 20 === 0) {
+    } else if (data.clicks % 200 === 0) {
         return 'medium';
-    } else if (data.clicks % 10 === 0) {
+    } else if (data.clicks % 100 === 0) {
         return 'small';
     } else {
         return null;
