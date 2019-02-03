@@ -19,6 +19,14 @@ const pool = new Pool({
     ssl: true,
 });  
 
+/** 
+ * Holds the total amount of clicks. The amount is
+ * fetched from the database whenever a new client has connected
+ * AND the new client is the only client connected. The amount is
+ * increased when any of the clients clicks a button. The amount is 
+*/
+let totalClicksAmount = 0;
+
 /**
  * Socket listener
  */
@@ -27,13 +35,14 @@ io.on('connection', socket => {
     console.log('Connection made, id: ', socket.id);
 
     // When a client connects, if the client is the only client in the server,
-    // fetch the amount of clicks from the database and emit the initclicks
-    // event to the client.
+    // fetch the amount of clicks to the global 'totalClicksAmount' variable 
+    // from the database and emit the initclicks event to the client.
     if (io.engine.clientsCount === 1) {
         console.log('Getting clicks from database');
         getClicksFromDatabase()
-        .then(res => {
-            socket.emit('initclicks', res.rows[0].clicks);
+        .then((res) => {
+            totalClicksAmount = res.rows[0].clicks;
+            socket.emit('initclicks', totalClicksAmount);
         })
     } else {
         // If the new client is not the only client, get the last client before the new client
@@ -52,27 +61,24 @@ io.on('connection', socket => {
 
     // When the socket disconnects, just log that the client has disconnected
     socket.on('disconnect', () => {
+        if (io.engine.clientsCount === 0) {
+            sendClicksToDatabase(totalClicksAmount);
+        }
+        console.log('Clients: ', io.engine.clientsCount);
         console.log('User disconnected, id: ', socket.id);
     });
 
-    // When the client clicks, emit a broadcast with the amount of 
-    // clicks to the other clients.
+    // When the client clicks grow the global 'totalClicksAmount' value by one
+    // and emit a broadcast with the amount of clicks to the other clients.
     socket.on('clicked', (data) => {
-        socket.broadcast.emit('clicked', data);
-        let win = countClicks(data); // Check if the client has won something after the click event
+        totalClicksAmount++;
+        socket.broadcast.emit('clicked', totalClicksAmount);
+        let win = countClicks(); // Check if the client has won something after the click event
         if (win !== null) {
             sendWinToDatabase(win, data); // Send the win to the Postgres database
             socket.emit('win', 'You win ' + win + '!'); // Let the client know that he/she has won something
         }
     });
-
-    // Called when a client e.g. closes the app.
-    socket.on('unload', (data) => { // Data has the amount of clicks currently
-        if (io.engine.clientsCount === 1) { // If the client was the last client connected...
-            console.log(io.engine.clientsCount);
-            sendClicksToDatabase(data); // ... send the amount of clicks to database.
-        }
-    })
 });
 
 /**
@@ -84,12 +90,12 @@ io.on('connection', socket => {
  * 
  * @param {Object} data 
  */
-function countClicks(data) {
-    if (data.clicks % 500 === 0) {
+function countClicks() {
+    if (totalClicksAmount % 500 === 0) {
         return 'big';
-    } else if (data.clicks % 200 === 0) {
+    } else if (totalClicksAmount % 200 === 0) {
         return 'medium';
-    } else if (data.clicks % 100 === 0) {
+    } else if (totalClicksAmount % 100 === 0) {
         return 'small';
     } else {
         return null;
@@ -112,10 +118,10 @@ async function getClicksFromDatabase() {
  * 
  * @param {Object} data holds the amount of clicks in an object
  */
-async function sendClicksToDatabase(data) {
-    console.log('Sending clicks: '+data.clicks);
+async function sendClicksToDatabase(clicks) {
+    console.log('Sending clicks: '+clicks);
     try {
-        return await pool.query(`UPDATE clicks SET clicks = ${data.clicks} WHERE ID = 1;`);
+        return await pool.query(`UPDATE clicks SET clicks = ${clicks} WHERE ID = 1;`);
     } catch (err) {
         console.log(err.stack);
     }
