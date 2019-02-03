@@ -79,6 +79,15 @@ io.on('connection', socket => {
             socket.emit('win', win); // Let the client know that he/she has won something
         }
     });
+
+    // When client moves to the leaderboards, 
+    // the client requests the leaderboards from the server.
+    socket.on('requestLeaderboards', () => {
+        getWinsFromDatabase()
+        .then((res) => {
+            socket.emit('leaderboards', res.rows);
+        });
+    })
 });
 
 /**
@@ -125,6 +134,17 @@ async function sendClicksToDatabase(clicks) {
     } catch (err) {
         console.log(err.stack);
     }
+}
+
+/**
+ * Gets all the win entries from database.
+ */
+async function getWinsFromDatabase() {
+    try {
+        return await pool.query('SELECT * FROM wins;');
+    } catch(err) {
+        console.log(err.stack);
+    };
 }
 
 /**
