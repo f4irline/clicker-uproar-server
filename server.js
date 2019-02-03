@@ -9,11 +9,8 @@ const io = socketIO(server);
 
 const { Pool } = require('pg');
 
-const localSettings = require('./localSettings.json');
-console.log(localSettings);
-
-
 // Postgres local settings
+// const localSettings = require('./localSettings.json');
 // const pool = new Pool(localSettings);
 
 // Postgres heroku settings
@@ -132,10 +129,10 @@ async function sendClicksToDatabase(data) {
  */
 async function sendWinToDatabase(winAmount, data) {
     console.log(data.user)
-    console.log(data.clicks);
+    console.log(data.userClicks);
     try {
         return await pool.query(`INSERT INTO wins (user_name, clicks, win_amount) 
-                                VALUES ('${data.user}', ${data.clicks}, '${winAmount}');`);
+                                VALUES ('${data.user}', ${data.userClicks}, '${winAmount}');`);
     } catch (err) {
         console.log(err.stack);
     }
