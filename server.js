@@ -7,11 +7,32 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIO(server);
 
-const URL = 'https://clicker-uproar.firebaseio.com/clicks.json';
+const { Pool } = require('pg');
 
-// This is what the socket.io syntax is like, we will work this later
+const pool = new Pool({
+    connectionString: process.env.DATABASE_URL,
+    ssl: true,
+});  
+
 io.on('connection', socket => {
+
     console.log('Connection made, id: ', socket.id);
+
+    if (io.engine.clientsCount === 1) {
+        console.log('Getting clicks from database');
+        getClicksFromDatabase()
+        .then(res => {
+            socket.emit('initclicks', res.rows[0].clicks);
+        })
+    } else {
+        socket.broadcast.emit('requestClicks', socket.id);
+    }
+
+    socket.on('newConnection', (data) => {
+        console.log(data);
+        io.to(`${data.socket}`).emit('initclicks', data.clicks);
+    })
+
     socket.on('disconnect', () => {
         console.log('User disconnected, id: ', socket.id);
     });
@@ -20,14 +41,17 @@ io.on('connection', socket => {
         socket.broadcast.emit('clicked', data);
         let win = countClicks(data);
         if (win !== null) {
-            sendWinToDatabase(socket, data);
-            socket.emit('win', 'You win ' + countClicks(data) + '!');
+            let winAmount = countClicks(data);
+            sendWinToDatabase(winAmount, data);
+            socket.emit('win', 'You win ' + winAmount + '!');
         }
     });
 
     socket.on('unload', (data) => {
-        sendClicksToDatabase(data)
-            .then(response => console.log(response));
+        if (io.engine.clientsCount === 1) {
+            console.log(io.engine.clientsCount);
+            sendClicksToDatabase(data);
+        }
     })
 });
 
@@ -43,14 +67,32 @@ function countClicks(data) {
     }
 }
 
-function sendClicksToDatabase(data) {
-    console.log('Sending clicks: '+data.clicks);
+async function getClicksFromDatabase() {
+    try {
+        return await pool.query('SELECT clicks FROM clicks;');
+    } catch(err) {
+        console.log(err.stack);
+    };
 }
 
-function sendWinToDatabase(socket, data) {
-    console.log(socket.id);
+async function sendClicksToDatabase(data) {
+    console.log('Sending clicks: '+data.clicks);
+    try {
+        return await pool.query(`UPDATE clicks SET clicks = ${data.clicks} WHERE ID = 1;`);
+    } catch (err) {
+        console.log(err.stack);
+    }
+}
+
+async function sendWinToDatabase(winAmount, data) {
     console.log(data.user)
     console.log(data.clicks);
+    try {
+        return await pool.query(`INSERT INTO wins (user_name, clicks, win_amount) 
+                                VALUES ('${data.user}', ${data.clicks}, '${winAmount}');`);
+    } catch (err) {
+        console.log(err.stack);
+    }
 }
 
 
