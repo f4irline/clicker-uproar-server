@@ -11,14 +11,14 @@ const io = socketIO(server);
 const { Pool } = require('pg');
 
 // Postgres local settings
-// const localSettings = require('./localSettings.json');
-// const pool = new Pool(localSettings);
+const localSettings = require('./localSettings.json');
+const pool = new Pool(localSettings);
 
 // Postgres heroku settings
-const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
-    ssl: true,
-});  
+// const pool = new Pool({
+//     connectionString: process.env.DATABASE_URL,
+//     ssl: true,
+// });  
 
 /** 
  * Holds the total amount of clicks. The amount is
@@ -32,7 +32,7 @@ let totalClicksAmount = 0;
  * CORS options. Accept requests from localhost and the actual
  * domain of the app.
  * 
- * Not used right now because of some problems with mobile devices and 
+ * Not used right now because of some problems with Android devices and 
  * Mac's.
  */
 const whitelist= ['http://localhost:3000', 'https://clicker-uproar-thegame.herokuapp.com'];
