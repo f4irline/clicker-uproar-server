@@ -1,6 +1,7 @@
 const express = require('express');
 const http = require('http');
 const socketIO = require('socket.io');
+const cors = require('cors');
 
 const PORT = process.env.PORT || 5000;
 const app = express();
@@ -26,6 +27,34 @@ const pool = new Pool({
  * increased when any of the clients clicks a button. The amount is 
 */
 let totalClicksAmount = 0;
+
+/**
+ * CORS options. Accept requests from localhost and the actual
+ * domain of the app.
+ */
+const whitelist= ['http://localhost:3000', 'https://https://clicker-uproar.herokuapp.com'];
+const corsOptions = {
+    origin: function(origin, callback) {
+        if (whitelist.indexOf(origin) !== -1) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    optionsSuccessStatus: 200
+}
+
+/**
+ * Handles get requests to '/leaderboards'. Gets the 
+ * wins from database and responds with the data.
+ */
+app.get('/leaderboards', cors(corsOptions), (req, res) => {
+    getWinsFromDatabase()
+    .then((winners) => {
+        res.setHeader('Content-Type', 'application/json');
+        res.json(winners.rows);
+    });
+});
 
 /**
  * Socket listener
@@ -79,15 +108,6 @@ io.on('connection', socket => {
             socket.emit('win', win); // Let the client know that he/she has won something
         }
     });
-
-    // When client moves to the leaderboards, 
-    // the client requests the leaderboards from the server.
-    socket.on('requestLeaderboards', () => {
-        getWinsFromDatabase()
-        .then((res) => {
-            socket.emit('leaderboards', res.rows);
-        });
-    })
 });
 
 /**
