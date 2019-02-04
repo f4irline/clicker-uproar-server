@@ -16,6 +16,12 @@ The app is divided into to parts: client and server. **This is the repo of the s
 
 **It's currently deployed on Heroku** : [Heroku](https://clicker-uproar-thegame.herokuapp.com/).
 
+### The game
+
+The goal of the game is to click the rock and swing the pickaxe and win prizes. Every client can see how many clicks is needed to the next prize, but the client's do not know if the next prize is going to be the small (gold), medium (diamond) or the big (ruby) prize.
+
+All the winners are saved to a PostgreSQL database and are displayed on a separate 'Leaderboards' -page.
+
 ### To run
 
 1. Clone this repository anywhere on your local system
