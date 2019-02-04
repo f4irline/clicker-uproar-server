@@ -31,6 +31,9 @@ let totalClicksAmount = 0;
 /**
  * CORS options. Accept requests from localhost and the actual
  * domain of the app.
+ * 
+ * Not used right now because of some problems with mobile devices and 
+ * Mac's.
  */
 const whitelist= ['http://localhost:3000', 'https://clicker-uproar-thegame.herokuapp.com'];
 const corsOptions = {
@@ -41,6 +44,8 @@ const corsOptions = {
             callback(new Error('Not allowed by CORS'));
         }
     },
+    allowedHeaders: ['Content-Type', 'Authorization', 'Content-Length', 'X-Requested-With', 'Accept'],
+    methods: ['GET', 'PUT', 'POST', 'DELETE', 'OPTIONS'],
     optionsSuccessStatus: 200
 }
 
