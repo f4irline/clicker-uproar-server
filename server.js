@@ -89,9 +89,12 @@ io.on('connection', socket => {
     })
 
     // When the socket disconnects, just log that the client has disconnected
+    // and check if it was the last client. If it was, send the amount of clicks to
+    // the database (to avoid losing the amount of clicks if the server happens to
+    // shutdown.
     socket.on('disconnect', () => {
         console.log(io.engine.clientsCount);
-        if (io.engine.clientsCount === 0) {
+        if (io.engine.clientsCount <= 1) {
             sendClicksToDatabase(totalClicksAmount);
         }
         console.log('Clients: ', io.engine.clientsCount);
@@ -109,11 +112,6 @@ io.on('connection', socket => {
             socket.emit('win', win); // Let the client know that he/she has won something
         }
     });
-
-    socket.on('endconnection', () => {
-        console.log('Ending connection');
-        socket.disconnect(0);
-    })
 });
 
 /**
