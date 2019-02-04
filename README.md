@@ -20,6 +20,7 @@ The app is divided into to parts: client and server. **This is the repo of the s
 
 1. Clone this repository anywhere on your local system
 2. Clone the [client side repository](https://github.com/f4irline/clicker-uproar-client) to anywhere on your local system (maybe in the same directory as client would be convenient)
-3. Start the server side, by going in the folder you just cloned here from the client side repository, and run 'node server.js' there via command line.
-4. Start the client side, by going in the folder you just cloned from the [client side repository](https://github.com/f4irline/clicker-uproar-client) and running 'npm start' there via command line.
-5. Open up your browser (if it doesn't open up automatically by npm start) and go to 'localhost:3000'. React scripts may take a while to start, so be patient.
+3. Install dependencies on both of the new directories: go to both folders via command line and run 'npm install' and wait for the installation to be completed.
+4. Start the server side, by going in the folder you just cloned here from the server side repository, and run 'node server.js' there via command line.
+5. Start the client side, by going in the folder you just cloned from the [client side repository](https://github.com/f4irline/clicker-uproar-client) and running 'npm start' there via command line.
+6. Open up your browser (if it doesn't open up automatically by npm start) and go to 'localhost:3000'. React scripts may take a while to start, so be patient.
