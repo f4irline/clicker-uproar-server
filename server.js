@@ -32,7 +32,7 @@ let totalClicksAmount = 0;
  * CORS options. Accept requests from localhost and the actual
  * domain of the app.
  */
-const whitelist= ['http://localhost:3000', 'https://https://clicker-uproar.herokuapp.com'];
+const whitelist= ['http://localhost:3000', 'https://clicker-uproar.herokuapp.com'];
 const corsOptions = {
     origin: function(origin, callback) {
         if (whitelist.indexOf(origin) !== -1) {
