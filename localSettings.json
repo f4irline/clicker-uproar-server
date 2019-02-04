@@ -1,0 +1,8 @@
+{
+    "user": "hxamyevmmxlfxy",
+    "host": "ec2-54-75-245-94.eu-west-1.compute.amazonaws.com",
+    "database": "d86gmrfp1sjoh6",
+    "password": "1aeb8003516889b14458e51403c6751871897fc0b06a70f0c5c095170d6d7d01",
+    "port": 5432,
+    "ssl": true
+}
