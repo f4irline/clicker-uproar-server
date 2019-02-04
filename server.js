@@ -53,7 +53,7 @@ const corsOptions = {
  * Handles get requests to '/leaderboards'. Gets the 
  * wins from database and responds with the data.
  */
-app.get('/leaderboards', cors(corsOptions), (req, res) => {
+app.get('/leaderboards', cors(), (req, res) => {
     getWinsFromDatabase()
     .then((winners) => {
         res.setHeader('Content-Type', 'application/json');
