@@ -90,6 +90,7 @@ io.on('connection', socket => {
 
     // When the socket disconnects, just log that the client has disconnected
     socket.on('disconnect', () => {
+        console.log(io.engine.clientsCount);
         if (io.engine.clientsCount === 0) {
             sendClicksToDatabase(totalClicksAmount);
         }
@@ -108,24 +109,29 @@ io.on('connection', socket => {
             socket.emit('win', win); // Let the client know that he/she has won something
         }
     });
+
+    socket.on('endconnection', () => {
+        console.log('Ending connection');
+        socket.disconnect(0);
+    })
 });
 
 /**
  * Checks if the client has won something.
  * 
- * Every 50th click wins big, every 20th click wins medium
- * and every 10th click wins small. If there's overlapping wins,
+ * Every 500th click wins ruby, every 200th click wins diamond
+ * and every 100th click wins gold. If there's overlapping wins,
  * the client wins the biggest amount.
  * 
  * @param {Object} data 
  */
 function countClicks() {
     if (totalClicksAmount % 500 === 0) {
-        return 'big';
+        return 'ruby';
     } else if (totalClicksAmount % 200 === 0) {
-        return 'medium';
+        return 'diamond';
     } else if (totalClicksAmount % 100 === 0) {
-        return 'small';
+        return 'gold';
     } else {
         return null;
     }
