@@ -11,14 +11,14 @@ const io = socketIO(server);
 const { Pool } = require('pg');
 
 // Postgres local settings
-const localSettings = require('./localSettings.json');
-const pool = new Pool(localSettings);
+// const localSettings = require('./localSettings.json');
+// const pool = new Pool(localSettings);
 
 // Postgres heroku settings
-// const pool = new Pool({
-//     connectionString: process.env.DATABASE_URL,
-//     ssl: true,
-// });  
+const pool = new Pool({
+    connectionString: process.env.DATABASE_URL,
+    ssl: true,
+});  
 
 /** 
  * Holds the total amount of clicks. The amount is
